@@ -1,0 +1,69 @@
+{
+  "kind": "collectionType",
+  "collectionName": "transacciones",
+  "info": {
+    "singularName": "transaccion",
+    "pluralName": "transacciones",
+    "displayName": "Transacción",
+    "description": "Historial de transacciones y pagos"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "cliente": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::cliente.cliente",
+      "required": true
+    },
+    "cuenta": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::cuenta.cuenta",
+      "required": true
+    },
+    "colaborador": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::usuario.usuario",
+      "required": true
+    },
+    "monto": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "tipo": {
+      "type": "enumeration",
+      "enum": [
+        "venta",
+        "renovacion",
+        "reembolso"
+      ],
+      "required": true
+    },
+    "estado": {
+      "type": "enumeration",
+      "enum": [
+        "pendiente",
+        "completada",
+        "fallida"
+      ],
+      "default": "pendiente",
+      "required": true
+    },
+    "metodo_pago": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "fecha": {
+      "type": "datetime",
+      "required": true
+    },
+    "notas": {
+      "type": "text"
+    }
+  }
+}

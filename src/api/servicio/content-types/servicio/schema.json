@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "servicios",
+  "info": {
+    "singularName": "servicio",
+    "pluralName": "servicios",
+    "displayName": "Servicio",
+    "description": "Plataformas de streaming disponibles"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "descripcion": {
+      "type": "text"
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    },
+    "logo_url": {
+      "type": "string",
+      "maxLength": 500
+    },
+    "color": {
+      "type": "string",
+      "required": true,
+      "default": "#3B82F6",
+      "maxLength": 7
+    },
+    "precio_mensual": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "cuentas": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::cuenta.cuenta",
+      "mappedBy": "servicio"
+    },
+    "planes": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::plan.plan",
+      "mappedBy": "servicio"
+    }
+  }
+}

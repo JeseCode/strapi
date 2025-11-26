@@ -1,0 +1,48 @@
+{
+  "kind": "collectionType",
+  "collectionName": "usuarios",
+  "info": {
+    "singularName": "usuario",
+    "pluralName": "usuarios",
+    "displayName": "Usuario",
+    "description": "Usuarios del sistema con roles específicos"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "rol": {
+      "type": "enumeration",
+      "enum": ["administrador", "gerente", "colaborador"],
+      "default": "colaborador",
+      "required": true
+    },
+    "telefono": {
+      "type": "string",
+      "maxLength": 20
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "clientes": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::cliente.cliente",
+      "mappedBy": "colaborador"
+    },
+    "cuentas_vendidas": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::cuenta.cuenta",
+      "mappedBy": "colaborador"
+    }
+  }
+}

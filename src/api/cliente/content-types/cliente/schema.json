@@ -1,0 +1,58 @@
+{
+  "kind": "collectionType",
+  "collectionName": "clientes",
+  "info": {
+    "singularName": "cliente",
+    "pluralName": "clientes",
+    "displayName": "Cliente",
+    "description": "Clientes que compran cuentas de streaming"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "email": {
+      "type": "email",
+      "maxLength": 255
+    },
+    "telefono": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "maxLength": 20
+    },
+    "estado": {
+      "type": "enumeration",
+      "enum": ["activo", "inactivo", "suspendido"],
+      "default": "activo",
+      "required": true
+    },
+    "colaborador": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::usuario.usuario",
+      "inversedBy": "clientes"
+    },
+    "cuentas": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::cuenta.cuenta",
+      "mappedBy": "cliente"
+    },
+    "perfiles": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::perfil.perfil",
+      "mappedBy": "cliente"
+    },
+    "notas": {
+      "type": "text"
+    }
+  }
+}

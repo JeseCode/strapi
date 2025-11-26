@@ -1,0 +1,46 @@
+{
+  "kind": "collectionType",
+  "collectionName": "planes",
+  "info": {
+    "singularName": "plan",
+    "pluralName": "planes",
+    "displayName": "Plan",
+    "description": "Planes disponibles para cada servicio de streaming"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "precio": {
+      "type": "decimal",
+      "required": true,
+      "default": 0
+    },
+    "descripcion": {
+      "type": "text"
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "servicio": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::servicio.servicio",
+      "inversedBy": "planes"
+    },
+    "cuentas": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::cuenta.cuenta",
+      "mappedBy": "plan"
+    }
+  }
+}

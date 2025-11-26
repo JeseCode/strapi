@@ -1,0 +1,114 @@
+{
+  "kind": "collectionType",
+  "collectionName": "cuentas",
+  "info": {
+    "singularName": "cuenta",
+    "pluralName": "cuentas",
+    "displayName": "Cuenta",
+    "description": "Cuentas de streaming vendidas a clientes"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "cliente": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::cliente.cliente",
+      "inversedBy": "cuentas",
+      "required": true
+    },
+    "servicio": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::servicio.servicio",
+      "inversedBy": "cuentas",
+      "required": true
+    },
+    "plan": {
+      "type": "string",
+      "required": false,
+      "maxLength": 100,
+      "default": "Estándar"
+    },
+    "email": {
+      "type": "email",
+      "required": true,
+      "maxLength": 255
+    },
+    "password": {
+      "type": "string",
+      "required": true,
+      "maxLength": 100
+    },
+    "fechaInicio": {
+      "type": "date",
+      "required": true
+    },
+    "fechaVencimiento": {
+      "type": "date",
+      "required": true
+    },
+    "precio": {
+      "type": "decimal",
+      "required": true,
+      "min": 0
+    },
+    "estado": {
+      "type": "enumeration",
+      "enum": ["activa", "por_vencer", "vencida"],
+      "default": "activa",
+      "required": true
+    },
+    "colaborador": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::usuario.usuario",
+      "inversedBy": "cuentas_vendidas"
+    },
+    "notas": {
+      "type": "text"
+    },
+    "saldo_disponible": {
+      "type": "decimal",
+      "default": 0,
+      "min": 0
+    },
+    "fecha_ultima_recarga": {
+      "type": "date"
+    },
+    "alerta_dias": {
+      "type": "integer",
+      "default": 7,
+      "min": 1,
+      "max": 30
+    },
+    "tipo_cuenta": {
+      "type": "enumeration",
+      "enum": ["individual", "familiar", "premium"],
+      "default": "individual"
+    },
+    "max_perfiles": {
+      "type": "integer",
+      "default": 1,
+      "min": 1,
+      "max": 10
+    },
+    "perfiles_activos": {
+      "type": "integer",
+      "default": 0,
+      "min": 0
+    },
+    "perfiles": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::perfil.perfil",
+      "mappedBy": "cuenta"
+    },
+    "perfiles_pines": {
+      "type": "json",
+      "default": []
+    }
+  }
+}
