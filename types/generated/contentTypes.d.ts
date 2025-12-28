@@ -492,11 +492,7 @@ export interface ApiCuentaCuenta extends Struct.CollectionTypeSchema {
       > &
       Schema.Attribute.DefaultTo<0>;
     perfiles_pines: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;
-    plan: Schema.Attribute.String &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 100;
-      }> &
-      Schema.Attribute.DefaultTo<'Est\u00E1ndar'>;
+    plan: Schema.Attribute.Relation<'manyToOne', 'api::plan.plan'>;
     precio: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
