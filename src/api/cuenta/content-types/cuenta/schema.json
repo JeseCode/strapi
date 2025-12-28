@@ -27,10 +27,10 @@
       "required": true
     },
     "plan": {
-      "type": "string",
-      "required": false,
-      "maxLength": 100,
-      "default": "Estándar"
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::plan.plan",
+      "inversedBy": "cuentas"
     },
     "email": {
       "type": "email",
@@ -57,7 +57,11 @@
     },
     "estado": {
       "type": "enumeration",
-      "enum": ["activa", "por_vencer", "vencida"],
+      "enum": [
+        "activa",
+        "por_vencer",
+        "vencida"
+      ],
       "default": "activa",
       "required": true
     },
@@ -86,7 +90,11 @@
     },
     "tipo_cuenta": {
       "type": "enumeration",
-      "enum": ["individual", "familiar", "premium"],
+      "enum": [
+        "individual",
+        "familiar",
+        "premium"
+      ],
       "default": "individual"
     },
     "max_perfiles": {
