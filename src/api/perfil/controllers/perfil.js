@@ -1,6 +1,6 @@
-import { factories } from "@strapi/strapi";
+const { factories } = require("@strapi/strapi");
 
-export default factories.createCoreController(
+module.exports = factories.createCoreController(
   "api::perfil.perfil",
   ({ strapi }) => ({
     // Endpoint personalizado para vincular cliente a cuenta

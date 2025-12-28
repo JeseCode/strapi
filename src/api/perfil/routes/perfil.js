@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   routes: [
     // Rutas estándar de perfiles
     {

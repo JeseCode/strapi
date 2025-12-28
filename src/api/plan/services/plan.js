@@ -1,9 +1,3 @@
-'use strict';
+const { factories } = require('@strapi/strapi');
 
-/**
- * plan service
- */
-
-const { createCoreService } = require('@strapi/strapi').factories;
-
-module.exports = createCoreService('api::plan.plan');
+module.exports = factories.createCoreService('api::plan.plan');
