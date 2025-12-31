@@ -492,7 +492,10 @@ export interface ApiCuentaCuenta extends Struct.CollectionTypeSchema {
       > &
       Schema.Attribute.DefaultTo<0>;
     perfiles_pines: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;
-    plan: Schema.Attribute.Relation<'manyToOne', 'api::plan.plan'>;
+    plan: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 100;
+      }>;
     precio: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
       Schema.Attribute.SetMinMax<
@@ -602,7 +605,6 @@ export interface ApiPlanPlan extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    cuentas: Schema.Attribute.Relation<'oneToMany', 'api::cuenta.cuenta'>;
     descripcion: Schema.Attribute.Text;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::plan.plan'> &

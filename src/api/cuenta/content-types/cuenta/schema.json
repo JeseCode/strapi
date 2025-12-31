@@ -27,10 +27,8 @@
       "required": true
     },
     "plan": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::plan.plan",
-      "inversedBy": "cuentas"
+      "type": "string",
+      "maxLength": 100
     },
     "email": {
       "type": "email",
