@@ -538,11 +538,7 @@ export interface ApiPerfilPerfil extends Struct.CollectionTypeSchema {
   };
   attributes: {
     cliente: Schema.Attribute.Relation<'manyToOne', 'api::cliente.cliente'>;
-    codigo_pin: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.SetMinMaxLength<{
-        maxLength: 10;
-      }>;
+    codigo_pin: Schema.Attribute.String & Schema.Attribute.Required;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

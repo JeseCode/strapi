@@ -27,8 +27,7 @@
     },
     "codigo_pin": {
       "type": "string",
-      "required": true,
-      "maxLength": 10
+      "required": true
     },
     "nombre_perfil": {
       "type": "string",
@@ -37,7 +36,12 @@
     },
     "tipo_dispositivo": {
       "type": "enumeration",
-      "enum": ["TV", "Cel", "Tablet", "PC"],
+      "enum": [
+        "TV",
+        "Cel",
+        "Tablet",
+        "PC"
+      ],
       "default": "TV",
       "required": true
     },
@@ -51,7 +55,12 @@
     },
     "estado": {
       "type": "enumeration",
-      "enum": ["activo", "por_vencer", "vencido", "suspendido"],
+      "enum": [
+        "activo",
+        "por_vencer",
+        "vencido",
+        "suspendido"
+      ],
       "default": "activo",
       "required": true
     },

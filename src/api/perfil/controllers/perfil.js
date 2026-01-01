@@ -14,6 +14,8 @@ module.exports = factories.createCoreController(
           tipoDispositivo = "TV",
         } = ctx.request.body;
 
+        console.log("🚀 Backend: Vinculando cliente", { cuentaId, clienteId, codigoPinProporcionado });
+
         // Validar parámetros requeridos
         if (!cuentaId || !clienteId) {
           return ctx.badRequest("cuentaId y clienteId son requeridos");
@@ -25,6 +27,7 @@ module.exports = factories.createCoreController(
         });
 
         if (!cuenta) {
+          console.error("❌ Cuenta no encontrada:", cuentaId);
           return ctx.notFound("Cuenta no encontrada");
         }
 
@@ -34,16 +37,18 @@ module.exports = factories.createCoreController(
         });
 
         if (!cliente) {
+          console.error("❌ Cliente no encontrado:", clienteId);
           return ctx.notFound("Cliente no encontrado");
         }
 
         // Verificar si el cliente ya está vinculado a esta cuenta
+        // En Strapi 5, para filtrar por relación usamos el documentId
         const perfilExistente = await strapi
           .documents("api::perfil.perfil")
           .findMany({
             filters: {
-              cuenta: cuentaId,
-              cliente: clienteId,
+              cuenta: { documentId: { $eq: cuentaId } },
+              cliente: { documentId: { $eq: clienteId } },
             },
           });
 
@@ -56,9 +61,11 @@ module.exports = factories.createCoreController(
           .documents("api::perfil.perfil")
           .findMany({
             filters: {
-              cuenta: cuentaId,
+              cuenta: { documentId: { $eq: cuentaId } },
             },
           });
+
+        console.log(`📊 Perfiles actuales: ${perfilesActuales.length}/${cuenta.max_perfiles}`);
 
         if (perfilesActuales.length >= cuenta.max_perfiles) {
           return ctx.badRequest(
@@ -72,20 +79,31 @@ module.exports = factories.createCoreController(
         // Si no se proporcionó un PIN, generar uno único
         if (!codigoPin) {
           let pinExiste = true;
-          while (pinExiste) {
+          let intentos = 0;
+          while (pinExiste && intentos < 10) {
             codigoPin = Math.floor(1000 + Math.random() * 9000).toString();
             const perfilConPin = await strapi
               .documents("api::perfil.perfil")
               .findMany({
-                filters: { codigo_pin: codigoPin },
+                filters: { codigo_pin: { $eq: codigoPin } },
               });
             pinExiste = perfilConPin.length > 0;
+            intentos++;
           }
         }
 
         // Crear el perfil para vincular cliente a cuenta
-        const fechaVencimiento = new Date(cuenta.fechaVencimiento);
-        const precioIndividual = cuenta.precio / cuenta.max_perfiles;
+        const fechaVencimientoObj = cuenta.fechaVencimiento ? new Date(cuenta.fechaVencimiento) : new Date();
+        const precioTotal = parseFloat(cuenta.precio) || 0;
+        const maxPerfiles = parseInt(cuenta.max_perfiles) || 1;
+        const precioIndividual = precioTotal / maxPerfiles;
+
+        console.log("📝 Creando perfil con datos:", {
+          cuenta: cuentaId,
+          cliente: clienteId,
+          codigoPin,
+          fechaVencimiento: fechaVencimientoObj.toISOString().split("T")[0]
+        });
 
         const nuevoPerfil = await strapi
           .documents("api::perfil.perfil")
@@ -97,7 +115,7 @@ module.exports = factories.createCoreController(
               nombre_perfil: nombrePerfil || `Perfil de ${cliente.nombre}`,
               tipo_dispositivo: tipoDispositivo,
               fecha_activacion: new Date().toISOString().split("T")[0],
-              fecha_vencimiento: fechaVencimiento.toISOString().split("T")[0],
+              fecha_vencimiento: fechaVencimientoObj.toISOString().split("T")[0],
               precio_individual: precioIndividual,
               estado: "activo",
             },
@@ -112,8 +130,8 @@ module.exports = factories.createCoreController(
           message: `Cliente ${cliente.nombre} vinculado exitosamente a la cuenta con PIN: ${codigoPin}`,
         });
       } catch (error) {
-        console.error("Error al vincular cliente:", error);
-        return ctx.internalServerError("Error interno del servidor");
+        console.error("💥 Error detallado al vincular cliente:", error);
+        return ctx.internalServerError(`Error al vincular: ${error.message}`);
       }
     },
 
