@@ -621,6 +621,46 @@ export interface ApiPlanPlan extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiPlantillaWhatsappPlantillaWhatsapp
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'plantillas_whatsapp';
+  info: {
+    description: 'Plantillas de mensajes para WhatsApp';
+    displayName: 'Plantilla WhatsApp';
+    pluralName: 'plantillas-whatsapp';
+    singularName: 'plantilla-whatsapp';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    activo: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    campos_variables: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<[]>;
+    contenido: Schema.Attribute.Text & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    icono: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'\uD83D\uDD35'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::plantilla-whatsapp.plantilla-whatsapp'
+    > &
+      Schema.Attribute.Private;
+    nombre: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique;
+    orden: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    publishedAt: Schema.Attribute.DateTime;
+    servicio: Schema.Attribute.Relation<'manyToOne', 'api::servicio.servicio'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiServicioServicio extends Struct.CollectionTypeSchema {
   collectionName: 'servicios';
   info: {
@@ -664,6 +704,10 @@ export interface ApiServicioServicio extends Struct.CollectionTypeSchema {
         maxLength: 100;
       }>;
     planes: Schema.Attribute.Relation<'oneToMany', 'api::plan.plan'>;
+    plantillas_whatsapp: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::plantilla-whatsapp.plantilla-whatsapp'
+    >;
     precio_mensual: Schema.Attribute.Decimal &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;
@@ -1295,6 +1339,7 @@ declare module '@strapi/strapi' {
       'api::cuenta.cuenta': ApiCuentaCuenta;
       'api::perfil.perfil': ApiPerfilPerfil;
       'api::plan.plan': ApiPlanPlan;
+      'api::plantilla-whatsapp.plantilla-whatsapp': ApiPlantillaWhatsappPlantillaWhatsapp;
       'api::servicio.servicio': ApiServicioServicio;
       'api::transaccion.transaccion': ApiTransaccionTransaccion;
       'api::usuario.usuario': ApiUsuarioUsuario;

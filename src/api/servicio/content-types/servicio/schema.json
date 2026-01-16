@@ -23,7 +23,9 @@
     "logo": {
       "type": "media",
       "multiple": false,
-      "allowedTypes": ["images"]
+      "allowedTypes": [
+        "images"
+      ]
     },
     "logo_url": {
       "type": "string",
@@ -55,6 +57,12 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::plan.plan",
+      "mappedBy": "servicio"
+    },
+    "plantillas_whatsapp": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::plantilla-whatsapp.plantilla-whatsapp",
       "mappedBy": "servicio"
     }
   }

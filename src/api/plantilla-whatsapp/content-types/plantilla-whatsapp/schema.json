@@ -1,0 +1,49 @@
+{
+  "kind": "collectionType",
+  "collectionName": "plantillas_whatsapp",
+  "info": {
+    "singularName": "plantilla-whatsapp",
+    "pluralName": "plantillas-whatsapp",
+    "displayName": "Plantilla WhatsApp",
+    "description": "Plantillas de mensajes para WhatsApp"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true,
+      "unique": true
+    },
+    "icono": {
+      "type": "string",
+      "required": true,
+      "default": "🔵"
+    },
+    "contenido": {
+      "type": "text",
+      "required": true
+    },
+    "campos_variables": {
+      "type": "json",
+      "required": false,
+      "default": []
+    },
+    "servicio": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::servicio.servicio",
+      "inversedBy": "plantillas_whatsapp"
+    },
+    "activo": {
+      "type": "boolean",
+      "default": true
+    },
+    "orden": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}
