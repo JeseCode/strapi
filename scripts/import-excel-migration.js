@@ -113,6 +113,78 @@ const SERVICE_DEFINITIONS = {
     description: "Migrado desde Excel",
     aliases: ["chatgpt", "gpt", "openai"],
   },
+  vpn: {
+    name: "VPN",
+    color: "#0EA5E9",
+    description: "Migrado desde Excel",
+    aliases: ["vpn", "fastvpn", "tuxlervpn", "hma"],
+  },
+  xboxgamepass: {
+    name: "Xbox Game Pass",
+    color: "#107C10",
+    description: "Migrado desde Excel",
+    aliases: ["juego xbox", "xbox", "game pass", "gamepass"],
+  },
+  iproyal: {
+    name: "IP Royal",
+    color: "#1D4ED8",
+    description: "Migrado desde Excel",
+    aliases: ["ip royal", "iproyal"],
+  },
+  dataimpulse: {
+    name: "DataImpulse",
+    color: "#0891B2",
+    description: "Migrado desde Excel",
+    aliases: ["dataimpulse", "ip dataimpulse"],
+  },
+  streamvenpines: {
+    name: "Streamvenpines",
+    color: "#D97706",
+    description: "Migrado desde Excel",
+    aliases: ["streamvenpines", "streamvenpines.com"],
+  },
+  duolingo: {
+    name: "Duolingo",
+    color: "#58CC02",
+    description: "Migrado desde Excel",
+    aliases: ["duolingo", "doulingo"],
+  },
+  blackboxai: {
+    name: "Blackbox AI",
+    color: "#111827",
+    description: "Migrado desde Excel",
+    aliases: ["blackboxai", "blackbox ai"],
+  },
+  dominio: {
+    name: "Dominio",
+    color: "#7C2D12",
+    description: "Migrado desde Excel",
+    aliases: ["dominio"],
+  },
+  mercadolibre: {
+    name: "Mercado Libre",
+    color: "#FACC15",
+    description: "Migrado desde Excel",
+    aliases: ["mercado libre", "mercadolibre"],
+  },
+  rappi: {
+    name: "Rappi",
+    color: "#EF4444",
+    description: "Migrado desde Excel",
+    aliases: ["rappi"],
+  },
+  tigo: {
+    name: "Tigo",
+    color: "#2563EB",
+    description: "Migrado desde Excel",
+    aliases: ["tigo"],
+  },
+  comboplus: {
+    name: "Combo Plus",
+    color: "#1E40AF",
+    description: "Migrado desde Excel",
+    aliases: ["combo plus"],
+  },
 };
 
 const SHEET_CONFIGS = {
@@ -534,6 +606,11 @@ function buildMigrationPlan(filePath) {
 }
 
 function processInventorySheet(state, sheetName, rows, config) {
+  if (sheetName === "HENRY") {
+    processHenryInventorySheet(state, sheetName, rows, config);
+    return;
+  }
+
   const startRow = (config.headerRow || 1) + 1;
   let imported = 0;
   let reviewCount = 0;
@@ -578,6 +655,85 @@ function processInventorySheet(state, sheetName, rows, config) {
 
     if (sheetName === "HENRY" && !serviceSeed) {
       entry.estado_vinculacion = "revision";
+      reviewCount += 1;
+      state.review.push({
+        sheet: sheetName,
+        row: rowIndex,
+        reason: "Servicio no reconocido en hoja HENRY",
+        rowSnapshot: sanitizeRow(row),
+      });
+    }
+
+    state.inventory.push(entry);
+    imported += 1;
+  }
+
+  state.sheetSummaries.push({
+    sheet: sheetName,
+    type: "inventory",
+    rows: rows.length,
+    imported,
+    review: reviewCount,
+  });
+}
+
+function processHenryInventorySheet(state, sheetName, rows, config) {
+  const startRow = (config.headerRow || 1) + 1;
+  let imported = 0;
+  let reviewCount = 0;
+  let currentContext = null;
+
+  for (let rowIndex = startRow; rowIndex <= rows.length; rowIndex += 1) {
+    const row = rows[rowIndex - 1] || [];
+    const identifier = normalizeCell(getCell(row, config.identifierCol));
+    const serviceCell = normalizeCell(getCell(row, config.serviceCol));
+    const headerLabel = detectHenryHeaderLabel(row, config);
+    const directService =
+      resolveServiceFromRowText(serviceCell || "") ||
+      (headerLabel ? resolveServiceFromRowText(headerLabel) : null);
+
+    if (headerLabel) {
+      currentContext = directService
+        ? {
+            slug: directService.slug,
+            label: serviceCell || headerLabel,
+          }
+        : null;
+      continue;
+    }
+
+    if (!identifier) {
+      continue;
+    }
+
+    const serviceSeed = directService || currentContext;
+
+    if (serviceSeed?.slug) {
+      ensureServiceDraft(state, serviceSeed.slug, {
+        sheetName,
+        rowIndex,
+      });
+    }
+
+    const entry = {
+      key: `${sheetName}:${rowIndex}:${normalizeIdentifier(identifier)}`,
+      identificador_acceso: identifier,
+      email: isLikelyEmail(identifier) ? identifier.toLowerCase() : null,
+      password: normalizeCell(getCell(row, config.passwordCol)) || null,
+      servicioSlug: serviceSeed?.slug || null,
+      servicio_origen: serviceCell || serviceSeed?.label || SERVICE_DEFINITIONS[serviceSeed?.slug]?.name || null,
+      estado_vinculacion: serviceSeed?.slug ? "inventariada" : "revision",
+      categoria_origen: config.category,
+      notas: buildInventoryNotes(row, config),
+      source_sheet: sheetName,
+      source_row: rowIndex,
+      legacy_excel: buildLegacyExcel(sheetName, rowIndex, row, {
+        category: config.category,
+        inherited_service: currentContext?.slug || null,
+      }),
+    };
+
+    if (!serviceSeed?.slug) {
       reviewCount += 1;
       state.review.push({
         sheet: sheetName,
@@ -1053,7 +1209,9 @@ function buildTransactionDraft(row, rowIndex, config, flags, monto, dates) {
   }
 
   const extraValues = collectExtraValues(row, config.extraStartCol);
-  const explicitDate = extraValues.find((value) => parseExcelDate(value));
+  const explicitDate = extraValues
+    .map((value) => parseExcelDate(value))
+    .find(Boolean);
   const metodoPago = extraValues.find((value) => {
     const normalized = normalizeCell(value);
     return normalized && !parseExcelDate(normalized) && !looksLikeNumeric(normalized);
@@ -1361,11 +1519,14 @@ function finalizeServicesAndPlans(state) {
 
     account.precio = resolveAccountPrice(account.profiles);
     account.perfiles_pines = buildAccountPins(account.profiles);
-    account.max_perfiles = Math.max(
+    const observedMaxProfiles = Math.max(
       account.perfiles_pines.length || 0,
       account.profiles.length || 0,
       1,
     );
+    account.legacy_excel = account.legacy_excel || {};
+    account.legacy_excel.observed_max_perfiles = observedMaxProfiles;
+    account.max_perfiles = Math.min(observedMaxProfiles, 10);
     account.perfiles_activos = account.profiles.length;
     account.estado = deriveAccountState(account.fechaVencimiento, 7);
   }
@@ -1736,11 +1897,6 @@ async function applyMigration(plan) {
           source_row: {
             $eq: profile.source_row,
           },
-          cuenta: {
-            documentId: {
-              $eq: accountDocumentIds.get(account.key),
-            },
-          },
         });
 
         if (existing) {
@@ -1789,22 +1945,42 @@ async function applyMigration(plan) {
         continue;
       }
 
-      await app.documents("api::transaccion.transaccion").create({
-        data: {
-          cliente: clientDocumentIds.get(transaction.clientKey),
-          cuenta: accountDocumentIds.get(transaction.accountKey),
-          colaborador: migrationUser.documentId,
-          monto: transaction.monto,
-          tipo: transaction.tipo,
-          estado: transaction.estado,
-          metodo_pago: clampText(transaction.metodo_pago, MAX_PAYMENT_METHOD_LENGTH),
-          fecha: toDateTimeString(transaction.fecha),
-          notas: transaction.notas,
-          source_sheet: transaction.source_sheet,
-          source_row: transaction.source_row,
-          legacy_excel: transaction.legacy_excel,
-        },
-      });
+      const baseTransactionData = {
+        cliente: clientDocumentIds.get(transaction.clientKey),
+        cuenta: accountDocumentIds.get(transaction.accountKey),
+        colaborador: migrationUser.documentId,
+        monto: transaction.monto,
+        tipo: transaction.tipo,
+        estado: transaction.estado,
+        metodo_pago: clampText(transaction.metodo_pago, MAX_PAYMENT_METHOD_LENGTH),
+        fecha: toDateTimeString(transaction.fecha),
+        notas: transaction.notas,
+        source_sheet: transaction.source_sheet,
+        source_row: transaction.source_row,
+        legacy_excel: transaction.legacy_excel,
+      };
+
+      try {
+        await app.documents("api::transaccion.transaccion").create({
+          data: baseTransactionData,
+        });
+      } catch (error) {
+        if (!isTimestampValidationError(error)) {
+          throw error;
+        }
+
+        await app.documents("api::transaccion.transaccion").create({
+          data: {
+            ...baseTransactionData,
+            fecha: new Date().toISOString(),
+            legacy_excel: {
+              ...(transaction.legacy_excel || {}),
+              invalid_transaction_date: transaction.fecha ?? null,
+              invalid_transaction_date_normalized: baseTransactionData.fecha,
+            },
+          },
+        });
+      }
       created.transactions += 1;
     }
 
@@ -1967,7 +2143,7 @@ function parseExcelDate(value) {
     const serial = Number.parseFloat(stringValue);
     const parsed = XLSX.SSF.parse_date_code(serial);
 
-    if (!parsed) {
+    if (!parsed || !isValidDateParts(parsed.y, parsed.m, parsed.d)) {
       return null;
     }
 
@@ -1975,6 +2151,10 @@ function parseExcelDate(value) {
   }
 
   if (/^\d{4}-\d{2}-\d{2}$/.test(stringValue)) {
+    const [year, month, day] = stringValue.split("-").map((part) => Number.parseInt(part, 10));
+    if (!isValidDateParts(year, month, day)) {
+      return null;
+    }
     return stringValue;
   }
 
@@ -2189,6 +2369,39 @@ function compactNotes(notes) {
   return [...new Set(values)].join(" | ");
 }
 
+function detectHenryHeaderLabel(row, config) {
+  const serviceCell = normalizeCell(getCell(row, config.serviceCol));
+  const identifier = normalizeCell(getCell(row, config.identifierCol));
+  const password = normalizeCell(getCell(row, config.passwordCol));
+  const activation = parseExcelDate(getCell(row, config.activationCol));
+  const expiration = parseExcelDate(getCell(row, config.expirationCol));
+  const phone = normalizePhone(getCell(row, config.phoneCol));
+  const price = parseMoney(getCell(row, config.priceCol));
+  const cost = parseMoney(getCell(row, config.costCol));
+
+  const hasOperationalData = Boolean(
+    password || activation || expiration || phone || price !== null || cost !== null,
+  );
+  const identifierLooksLikeAccess = Boolean(
+    identifier && (isLikelyEmail(identifier) || /@|\.com|\.net|\.org/i.test(identifier)),
+  );
+
+  if (serviceCell && !hasOperationalData && !identifierLooksLikeAccess) {
+    return serviceCell;
+  }
+
+  if (
+    !serviceCell &&
+    identifier &&
+    !hasOperationalData &&
+    !identifierLooksLikeAccess
+  ) {
+    return identifier;
+  }
+
+  return null;
+}
+
 function pickBestPlanName(planNames) {
   const values = [...planNames].filter(Boolean);
   return values.length > 0 ? values[0] : null;
@@ -2257,14 +2470,68 @@ function toDateTimeString(dateString) {
     return new Date().toISOString();
   }
 
-  return dateString.includes("T")
-    ? dateString
-    : `${dateString}T00:00:00.000Z`;
+  if (dateString instanceof Date && !Number.isNaN(dateString.getTime())) {
+    return dateString.toISOString();
+  }
+
+  const normalizedDate = parseExcelDate(dateString);
+  if (normalizedDate) {
+    return `${normalizedDate}T00:00:00.000Z`;
+  }
+
+  const text = String(dateString).trim();
+  if (!text) {
+    return new Date().toISOString();
+  }
+
+  if (text.includes("T")) {
+    const parsedDateTime = new Date(text);
+    return Number.isNaN(parsedDateTime.getTime())
+      ? new Date().toISOString()
+      : parsedDateTime.toISOString();
+  }
+
+  const parsedDate = new Date(text);
+  return Number.isNaN(parsedDate.getTime())
+    ? new Date().toISOString()
+    : parsedDate.toISOString();
 }
 
-main().catch((error) => {
-  console.error("");
-  console.error("Error ejecutando la migracion de Excel:");
-  console.error(error.stack || error.message || error);
-  process.exit(1);
-});
+function isValidDateParts(year, month, day) {
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    !Number.isInteger(day) ||
+    month < 1 ||
+    month > 12 ||
+    day < 1 ||
+    day > 31
+  ) {
+    return false;
+  }
+
+  const candidate = new Date(Date.UTC(year, month - 1, day));
+  return (
+    candidate.getUTCFullYear() === year &&
+    candidate.getUTCMonth() === month - 1 &&
+    candidate.getUTCDate() === day
+  );
+}
+
+function isTimestampValidationError(error) {
+  const message = error?.message || "";
+  return /timestamp or an ISO date/i.test(message);
+}
+
+if (require.main === module) {
+  main().catch((error) => {
+    console.error("");
+    console.error("Error ejecutando la migracion de Excel:");
+    console.error(error.stack || error.message || error);
+    process.exit(1);
+  });
+}
+
+module.exports = {
+  buildMigrationPlan,
+};

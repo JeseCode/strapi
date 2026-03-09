@@ -1,0 +1,136 @@
+{
+  "mode": "inspect",
+  "file": "C:\\Users\\COREi 5-10Th\\Desktop\\proyecto-trejo\\CUENTAS GENERADAS cel.xlsm",
+  "generatedAt": "2026-03-09T11:23:25.984Z",
+  "summary": {
+    "services": 27,
+    "plans": 1,
+    "clients": 1054,
+    "accounts": 556,
+    "profiles": 1402,
+    "transactions": 1031,
+    "inventory": 1421,
+    "review": 0
+  },
+  "sheets": [
+    {
+      "sheet": "CORREOS",
+      "type": "inventory",
+      "rows": 856,
+      "imported": 843,
+      "review": 0
+    },
+    {
+      "sheet": "Gráfico2",
+      "type": "ignored",
+      "rows": 1,
+      "imported": 0,
+      "review": 0
+    },
+    {
+      "sheet": "NETFLIX",
+      "type": "operational",
+      "rows": 136,
+      "importedAccounts": 40,
+      "importedProfiles": 131,
+      "importedInventory": 0,
+      "review": 0
+    },
+    {
+      "sheet": "Gráfico1",
+      "type": "ignored",
+      "rows": 1,
+      "imported": 0,
+      "review": 0
+    },
+    {
+      "sheet": "DISNEY+",
+      "type": "operational",
+      "rows": 206,
+      "importedAccounts": 32,
+      "importedProfiles": 185,
+      "importedInventory": 9,
+      "review": 0
+    },
+    {
+      "sheet": "AMAZON",
+      "type": "operational",
+      "rows": 231,
+      "importedAccounts": 48,
+      "importedProfiles": 145,
+      "importedInventory": 74,
+      "review": 0
+    },
+    {
+      "sheet": "HBO",
+      "type": "operational",
+      "rows": 190,
+      "importedAccounts": 39,
+      "importedProfiles": 122,
+      "importedInventory": 60,
+      "review": 0
+    },
+    {
+      "sheet": "PLEX y JELLYFIN",
+      "type": "operational",
+      "rows": 20,
+      "importedAccounts": 5,
+      "importedProfiles": 11,
+      "importedInventory": 4,
+      "review": 0
+    },
+    {
+      "sheet": "CRUN - PARA - VIX - APPLE",
+      "type": "operational",
+      "rows": 179,
+      "importedAccounts": 40,
+      "importedProfiles": 121,
+      "importedInventory": 34,
+      "review": 0
+    },
+    {
+      "sheet": "I-P-T-V",
+      "type": "operational",
+      "rows": 38,
+      "importedAccounts": 12,
+      "importedProfiles": 35,
+      "importedInventory": 0,
+      "review": 0
+    },
+    {
+      "sheet": "YOUTUBE",
+      "type": "operational",
+      "rows": 452,
+      "importedAccounts": 160,
+      "importedProfiles": 320,
+      "importedInventory": 129,
+      "review": 0
+    },
+    {
+      "sheet": "SPOTIFY",
+      "type": "operational",
+      "rows": 289,
+      "importedAccounts": 106,
+      "importedProfiles": 181,
+      "importedInventory": 63,
+      "review": 0
+    },
+    {
+      "sheet": "CANVA y CHATGPT",
+      "type": "operational",
+      "rows": 191,
+      "importedAccounts": 75,
+      "importedProfiles": 152,
+      "importedInventory": 33,
+      "review": 0
+    },
+    {
+      "sheet": "HENRY",
+      "type": "inventory",
+      "rows": 180,
+      "imported": 172,
+      "review": 0
+    }
+  ],
+  "review": []
+}
