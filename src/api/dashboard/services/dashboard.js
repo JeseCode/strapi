@@ -68,13 +68,21 @@ module.exports = () => ({
         limit: MAX_QUERY_LIMIT,
       }),
       strapi.documents("api::perfil.perfil").findMany({
-        fields: ["documentId", "nombre_perfil", "fecha_vencimiento"],
+        fields: [
+          "documentId",
+          "nombre_perfil",
+          "fecha_vencimiento",
+          "codigo_pin",
+          "requiere_seguimiento",
+          "requiere_cobro",
+          "requiere_reenvio",
+        ],
         populate: {
           cliente: {
             fields: ["documentId", "nombre", "telefono"],
           },
           cuenta: {
-            fields: ["documentId"],
+            fields: ["documentId", "email", "identificador_cuenta", "password"],
             populate: {
               servicio: {
                 fields: ["nombre"],
@@ -136,6 +144,13 @@ module.exports = () => ({
         telefono: perfil.cliente?.telefono || "Sin teléfono",
         servicio: perfil.cuenta?.servicio?.nombre || "N/A",
         nombrePerfil: perfil.nombre_perfil || "Perfil",
+        accessValue:
+          perfil.cuenta?.email || perfil.cuenta?.identificador_cuenta || "",
+        password: perfil.cuenta?.password || "",
+        codigoPin: perfil.codigo_pin || "",
+        requiereSeguimiento: Boolean(perfil.requiere_seguimiento),
+        requiereCobro: Boolean(perfil.requiere_cobro),
+        requiereReenvio: Boolean(perfil.requiere_reenvio),
         fechaVencimiento: perfil.fecha_vencimiento || "",
         diasRestantes: perfil.fecha_vencimiento
           ? diffInDays(today, perfil.fecha_vencimiento)
