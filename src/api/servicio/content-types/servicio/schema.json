@@ -64,6 +64,18 @@
       "relation": "oneToMany",
       "target": "api::plantilla-whatsapp.plantilla-whatsapp",
       "mappedBy": "servicio"
+    },
+    "source_sheet": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "source_row": {
+      "type": "integer",
+      "min": 1
+    },
+    "legacy_excel": {
+      "type": "json",
+      "default": {}
     }
   }
 }

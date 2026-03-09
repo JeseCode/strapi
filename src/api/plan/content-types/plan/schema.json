@@ -35,6 +35,18 @@
       "relation": "manyToOne",
       "target": "api::servicio.servicio",
       "inversedBy": "planes"
+    },
+    "source_sheet": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "source_row": {
+      "type": "integer",
+      "min": 1
+    },
+    "legacy_excel": {
+      "type": "json",
+      "default": {}
     }
   }
 }

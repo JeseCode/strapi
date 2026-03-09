@@ -1,0 +1,70 @@
+{
+  "kind": "collectionType",
+  "collectionName": "inventario_credenciales",
+  "info": {
+    "singularName": "inventario-credencial",
+    "pluralName": "inventario-credenciales",
+    "displayName": "Inventario de Credenciales",
+    "description": "Inventario legado de credenciales provenientes de hojas auxiliares o cuentas sin asignar"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "servicio": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::servicio.servicio"
+    },
+    "servicio_origen": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "identificador_acceso": {
+      "type": "string",
+      "required": true,
+      "maxLength": 255
+    },
+    "email": {
+      "type": "email",
+      "maxLength": 255
+    },
+    "password": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "estado_vinculacion": {
+      "type": "enumeration",
+      "enum": [
+        "inventariada",
+        "vinculada",
+        "revision",
+        "descartada"
+      ],
+      "default": "inventariada",
+      "required": true
+    },
+    "categoria_origen": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "notas": {
+      "type": "text"
+    },
+    "source_sheet": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120
+    },
+    "source_row": {
+      "type": "integer",
+      "required": true,
+      "min": 1
+    },
+    "legacy_excel": {
+      "type": "json",
+      "default": {}
+    }
+  }
+}

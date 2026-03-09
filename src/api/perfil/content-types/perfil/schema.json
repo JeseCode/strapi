@@ -71,6 +71,34 @@
     },
     "notas": {
       "type": "text"
+    },
+    "requiere_seguimiento": {
+      "type": "boolean",
+      "default": false
+    },
+    "requiere_cobro": {
+      "type": "boolean",
+      "default": false
+    },
+    "requiere_reenvio": {
+      "type": "boolean",
+      "default": false
+    },
+    "renovado_en_excel": {
+      "type": "boolean",
+      "default": false
+    },
+    "source_sheet": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "source_row": {
+      "type": "integer",
+      "min": 1
+    },
+    "legacy_excel": {
+      "type": "json",
+      "default": {}
     }
   }
 }

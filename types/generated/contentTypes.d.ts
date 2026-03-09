@@ -397,6 +397,7 @@ export interface ApiClienteCliente extends Struct.CollectionTypeSchema {
     estado: Schema.Attribute.Enumeration<['activo', 'inactivo', 'suspendido']> &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'activo'>;
+    legacy_excel: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -411,6 +412,17 @@ export interface ApiClienteCliente extends Struct.CollectionTypeSchema {
     notas: Schema.Attribute.Text;
     perfiles: Schema.Attribute.Relation<'oneToMany', 'api::perfil.perfil'>;
     publishedAt: Schema.Attribute.DateTime;
+    source_row: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+    source_sheet: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
     telefono: Schema.Attribute.String &
       Schema.Attribute.Required &
       Schema.Attribute.Unique &
@@ -463,6 +475,11 @@ export interface ApiCuentaCuenta extends Struct.CollectionTypeSchema {
     fecha_ultima_recarga: Schema.Attribute.Date;
     fechaInicio: Schema.Attribute.Date & Schema.Attribute.Required;
     fechaVencimiento: Schema.Attribute.Date & Schema.Attribute.Required;
+    identificador_cuenta: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    legacy_excel: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -517,10 +534,92 @@ export interface ApiCuentaCuenta extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<0>;
     servicio: Schema.Attribute.Relation<'manyToOne', 'api::servicio.servicio'> &
       Schema.Attribute.Required;
+    source_row: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+    source_sheet: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
     tipo_cuenta: Schema.Attribute.Enumeration<
       ['individual', 'familiar', 'premium']
     > &
       Schema.Attribute.DefaultTo<'individual'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiInventarioCredencialInventarioCredencial
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'inventario_credenciales';
+  info: {
+    description: 'Inventario legado de credenciales provenientes de hojas auxiliares o cuentas sin asignar';
+    displayName: 'Inventario de Credenciales';
+    pluralName: 'inventario-credenciales';
+    singularName: 'inventario-credencial';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    categoria_origen: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    email: Schema.Attribute.Email &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    estado_vinculacion: Schema.Attribute.Enumeration<
+      ['inventariada', 'vinculada', 'revision', 'descartada']
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'inventariada'>;
+    identificador_acceso: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    legacy_excel: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::inventario-credencial.inventario-credencial'
+    > &
+      Schema.Attribute.Private;
+    notas: Schema.Attribute.Text;
+    password: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    servicio: Schema.Attribute.Relation<'manyToOne', 'api::servicio.servicio'>;
+    servicio_origen: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
+    source_row: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+    source_sheet: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -553,6 +652,7 @@ export interface ApiPerfilPerfil extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<'activo'>;
     fecha_activacion: Schema.Attribute.Date & Schema.Attribute.Required;
     fecha_vencimiento: Schema.Attribute.Date & Schema.Attribute.Required;
+    legacy_excel: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -574,6 +674,25 @@ export interface ApiPerfilPerfil extends Struct.CollectionTypeSchema {
         number
       >;
     publishedAt: Schema.Attribute.DateTime;
+    renovado_en_excel: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    requiere_cobro: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    requiere_reenvio: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    requiere_seguimiento: Schema.Attribute.Boolean &
+      Schema.Attribute.DefaultTo<false>;
+    source_row: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+    source_sheet: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
     tipo_dispositivo: Schema.Attribute.Enumeration<
       ['TV', 'Cel', 'Tablet', 'PC']
     > &
@@ -604,6 +723,7 @@ export interface ApiPlanPlan extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     descripcion: Schema.Attribute.Text;
+    legacy_excel: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::plan.plan'> &
       Schema.Attribute.Private;
@@ -617,6 +737,17 @@ export interface ApiPlanPlan extends Struct.CollectionTypeSchema {
       Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
     servicio: Schema.Attribute.Relation<'manyToOne', 'api::servicio.servicio'>;
+    source_row: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+    source_sheet: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -689,6 +820,7 @@ export interface ApiServicioServicio extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     cuentas: Schema.Attribute.Relation<'oneToMany', 'api::cuenta.cuenta'>;
     descripcion: Schema.Attribute.Text;
+    legacy_excel: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -714,6 +846,17 @@ export interface ApiServicioServicio extends Struct.CollectionTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<0>;
     publishedAt: Schema.Attribute.DateTime;
+    source_row: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+    source_sheet: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -750,6 +893,7 @@ export interface ApiTransaccionTransaccion extends Struct.CollectionTypeSchema {
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'pendiente'>;
     fecha: Schema.Attribute.DateTime & Schema.Attribute.Required;
+    legacy_excel: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -770,6 +914,17 @@ export interface ApiTransaccionTransaccion extends Struct.CollectionTypeSchema {
       >;
     notas: Schema.Attribute.Text;
     publishedAt: Schema.Attribute.DateTime;
+    source_row: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+    source_sheet: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
     tipo: Schema.Attribute.Enumeration<['venta', 'renovacion', 'reembolso']> &
       Schema.Attribute.Required;
     updatedAt: Schema.Attribute.DateTime;
@@ -1339,6 +1494,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::cliente.cliente': ApiClienteCliente;
       'api::cuenta.cuenta': ApiCuentaCuenta;
+      'api::inventario-credencial.inventario-credencial': ApiInventarioCredencialInventarioCredencial;
       'api::perfil.perfil': ApiPerfilPerfil;
       'api::plan.plan': ApiPlanPlan;
       'api::plantilla-whatsapp.plantilla-whatsapp': ApiPlantillaWhatsappPlantillaWhatsapp;

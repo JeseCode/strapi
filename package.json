@@ -9,6 +9,10 @@
     "deploy": "strapi deploy",
     "dev": "strapi develop",
     "develop": "strapi develop",
+    "excel:migration": "node scripts/import-excel-migration.js",
+    "excel:migration:inspect": "node scripts/import-excel-migration.js inspect",
+    "excel:migration:dry-run": "node scripts/import-excel-migration.js dry-run",
+    "excel:migration:apply": "node scripts/import-excel-migration.js apply",
     "start": "strapi start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
@@ -23,9 +27,9 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
-    "styled-components": "^6.0.0"
+    "styled-components": "^6.0.0",
+    "xlsx": "^0.18.5"
   },
-  "devDependencies": {},
   "engines": {
     "node": ">=18.0.0 <=22.x.x",
     "npm": ">=6.0.0"

@@ -35,6 +35,10 @@
       "required": true,
       "maxLength": 255
     },
+    "identificador_cuenta": {
+      "type": "string",
+      "maxLength": 255
+    },
     "password": {
       "type": "string",
       "required": true,
@@ -116,6 +120,18 @@
     "perfiles_pines": {
       "type": "json",
       "default": []
+    },
+    "source_sheet": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "source_row": {
+      "type": "integer",
+      "min": 1
+    },
+    "legacy_excel": {
+      "type": "json",
+      "default": {}
     }
   }
 }
