@@ -455,7 +455,9 @@ export interface ApiCuentaCuenta extends Struct.CollectionTypeSchema {
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 255;
       }>;
-    estado: Schema.Attribute.Enumeration<['activa', 'por_vencer', 'vencida']> &
+    estado: Schema.Attribute.Enumeration<
+      ['activa', 'por_vencer', 'vencida', 'inactiva']
+    > &
       Schema.Attribute.Required &
       Schema.Attribute.DefaultTo<'activa'>;
     fecha_ultima_recarga: Schema.Attribute.Date;

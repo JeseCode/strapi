@@ -58,7 +58,8 @@
       "enum": [
         "activa",
         "por_vencer",
-        "vencida"
+        "vencida",
+        "inactiva"
       ],
       "default": "activa",
       "required": true

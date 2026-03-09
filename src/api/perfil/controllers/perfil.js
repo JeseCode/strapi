@@ -1,5 +1,30 @@
 const { factories } = require("@strapi/strapi");
 
+const getLocalDateString = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const addMonthsToDateString = (dateString, months = 1) => {
+  if (!dateString) {
+    return getLocalDateString();
+  }
+
+  const [year, month, day] = dateString.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
+  date.setMonth(date.getMonth() + months);
+
+  return getLocalDateString(date);
+};
+
+const extractPerfilNumeroFromName = (nombrePerfil = "") => {
+  const match = nombrePerfil.match(/Perfil\s+(\d+)/i);
+  return match ? Number.parseInt(match[1], 10) : null;
+};
+
 module.exports = factories.createCoreController(
   "api::perfil.perfil",
   ({ strapi }) => ({
@@ -9,12 +34,24 @@ module.exports = factories.createCoreController(
         const {
           cuentaId,
           clienteId,
+          perfilNumero,
           nombrePerfil,
           codigoPin: codigoPinProporcionado,
           tipoDispositivo = "TV",
+          fechaActivacion,
+          fechaVencimiento,
+          precioIndividual,
+          notas,
         } = ctx.request.body;
 
-        console.log("🚀 Backend: Vinculando cliente", { cuentaId, clienteId, codigoPinProporcionado });
+        console.log("🚀 Backend: Vinculando cliente", {
+          cuentaId,
+          clienteId,
+          perfilNumero,
+          codigoPinProporcionado,
+          fechaActivacion,
+          fechaVencimiento,
+        });
 
         // Validar parámetros requeridos
         if (!cuentaId || !clienteId) {
@@ -41,40 +78,74 @@ module.exports = factories.createCoreController(
           return ctx.notFound("Cliente no encontrado");
         }
 
-        // Verificar si el cliente ya está vinculado a esta cuenta
-        // En Strapi 5, para filtrar por relación usamos el documentId
-        const perfilExistente = await strapi
+        const perfilesConfigurados = Array.isArray(cuenta.perfiles_pines)
+          ? cuenta.perfiles_pines
+          : [];
+        const perfilConfigurado = perfilNumero
+          ? perfilesConfigurados.find(
+              (perfil) => Number(perfil.numero) === Number(perfilNumero)
+            )
+          : null;
+
+        if (perfilNumero && !perfilConfigurado) {
+          return ctx.badRequest("El perfil seleccionado no existe en la cuenta");
+        }
+
+        // En este proyecto los filtros por relación de Strapi v5 han sido inestables.
+        // Cargamos y filtramos manualmente para no mezclar perfiles de otras cuentas.
+        const todosLosPerfiles = await strapi
           .documents("api::perfil.perfil")
           .findMany({
-            filters: {
-              cuenta: { documentId: { $eq: cuentaId } },
-              cliente: { documentId: { $eq: clienteId } },
+            populate: {
+              cliente: true,
+              cuenta: true,
             },
           });
+
+        const perfilesDeCuenta = todosLosPerfiles.filter(
+          (perfil) => perfil.cuenta?.documentId === cuentaId
+        );
+
+        const perfilExistente = perfilesDeCuenta.filter(
+          (perfil) => perfil.cliente?.documentId === clienteId
+        );
 
         if (perfilExistente.length > 0) {
           return ctx.badRequest("El cliente ya está vinculado a esta cuenta");
         }
 
-        // Verificar límite de perfiles de la cuenta
-        const perfilesActuales = await strapi
-          .documents("api::perfil.perfil")
-          .findMany({
-            filters: {
-              cuenta: { documentId: { $eq: cuentaId } },
-            },
-          });
+        const perfilDelNumero = perfilNumero
+          ? perfilesDeCuenta.find((perfil) => {
+              const numeroPerfil = extractPerfilNumeroFromName(perfil.nombre_perfil);
+              if (numeroPerfil !== null) {
+                return numeroPerfil === Number(perfilNumero);
+              }
+
+              return (
+                codigoPinProporcionado &&
+                perfil.codigo_pin &&
+                perfil.codigo_pin.toString().trim() ===
+                  codigoPinProporcionado.toString().trim()
+              );
+            })
+          : null;
+
+        if (perfilDelNumero?.cliente) {
+          return ctx.badRequest("El perfil seleccionado ya está asignado a otro cliente");
+        }
+
+        const perfilesActuales = perfilesDeCuenta.filter((perfil) => perfil.cliente);
 
         console.log(`📊 Perfiles actuales: ${perfilesActuales.length}/${cuenta.max_perfiles}`);
 
-        if (perfilesActuales.length >= cuenta.max_perfiles) {
+        if (!perfilDelNumero && perfilesActuales.length >= cuenta.max_perfiles) {
           return ctx.badRequest(
             `La cuenta ha alcanzado el límite máximo de ${cuenta.max_perfiles} perfiles`
           );
         }
 
         // Usar el PIN proporcionado o generar uno aleatorio
-        let codigoPin = codigoPinProporcionado;
+        let codigoPin = codigoPinProporcionado || perfilConfigurado?.pin;
 
         // Si no se proporcionó un PIN, generar uno único
         if (!codigoPin) {
@@ -92,17 +163,30 @@ module.exports = factories.createCoreController(
           }
         }
 
-        // Crear el perfil para vincular cliente a cuenta
-        const fechaVencimientoObj = cuenta.fechaVencimiento ? new Date(cuenta.fechaVencimiento) : new Date();
+        const fechaActivacionFinal = fechaActivacion || getLocalDateString();
+        const fechaVencimientoFinal =
+          fechaVencimiento || addMonthsToDateString(fechaActivacionFinal, 1);
+
+        if (fechaVencimientoFinal <= fechaActivacionFinal) {
+          return ctx.badRequest(
+            "La fecha de vencimiento debe ser posterior a la fecha de activación"
+          );
+        }
+
         const precioTotal = parseFloat(cuenta.precio) || 0;
         const maxPerfiles = parseInt(cuenta.max_perfiles) || 1;
-        const precioIndividual = precioTotal / maxPerfiles;
+        const precioIndividualFinal =
+          Number(precioIndividual) > 0
+            ? Number(precioIndividual)
+            : precioTotal / maxPerfiles;
 
         console.log("📝 Creando perfil con datos:", {
           cuenta: cuentaId,
           cliente: clienteId,
+          perfilNumero,
           codigoPin,
-          fechaVencimiento: fechaVencimientoObj.toISOString().split("T")[0]
+          fechaActivacion: fechaActivacionFinal,
+          fechaVencimiento: fechaVencimientoFinal,
         });
 
         const nuevoPerfil = await strapi
@@ -114,10 +198,11 @@ module.exports = factories.createCoreController(
               codigo_pin: codigoPin,
               nombre_perfil: nombrePerfil || `Perfil de ${cliente.nombre}`,
               tipo_dispositivo: tipoDispositivo,
-              fecha_activacion: new Date().toISOString().split("T")[0],
-              fecha_vencimiento: fechaVencimientoObj.toISOString().split("T")[0],
-              precio_individual: precioIndividual,
+              fecha_activacion: fechaActivacionFinal,
+              fecha_vencimiento: fechaVencimientoFinal,
+              precio_individual: precioIndividualFinal,
               estado: "activo",
+              ...(notas ? { notas } : {}),
             },
             populate: {
               cuenta: true,
