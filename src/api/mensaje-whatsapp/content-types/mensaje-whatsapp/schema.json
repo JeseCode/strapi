@@ -1,0 +1,126 @@
+{
+  "kind": "collectionType",
+  "collectionName": "mensajes_whatsapp",
+  "info": {
+    "singularName": "mensaje-whatsapp",
+    "pluralName": "mensajes-whatsapp",
+    "displayName": "Mensaje WhatsApp",
+    "description": "Cola y bitácora operativa de mensajes de WhatsApp"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "campana": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::campana-whatsapp.campana-whatsapp",
+      "inversedBy": "mensajes"
+    },
+    "cliente": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::cliente.cliente"
+    },
+    "perfil": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::perfil.perfil"
+    },
+    "cuenta": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::cuenta.cuenta"
+    },
+    "servicio": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::servicio.servicio"
+    },
+    "tipo_accion": {
+      "type": "enumeration",
+      "enum": [
+        "cobro_hoy"
+      ],
+      "required": true,
+      "default": "cobro_hoy"
+    },
+    "source": {
+      "type": "enumeration",
+      "enum": [
+        "automatico",
+        "manual"
+      ],
+      "required": true,
+      "default": "automatico"
+    },
+    "fecha_operativa": {
+      "type": "date",
+      "required": true
+    },
+    "telefono_snapshot": {
+      "type": "string",
+      "required": true,
+      "maxLength": 40
+    },
+    "payload_snapshot": {
+      "type": "json",
+      "default": {}
+    },
+    "scheduledFor": {
+      "type": "datetime"
+    },
+    "sentAt": {
+      "type": "datetime"
+    },
+    "deliveredAt": {
+      "type": "datetime"
+    },
+    "readAt": {
+      "type": "datetime"
+    },
+    "status": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "sending",
+        "sent",
+        "delivered",
+        "read",
+        "failed",
+        "skipped",
+        "canceled"
+      ],
+      "required": true,
+      "default": "pending"
+    },
+    "provider": {
+      "type": "enumeration",
+      "enum": [
+        "meta"
+      ],
+      "required": true,
+      "default": "meta"
+    },
+    "providerMessageId": {
+      "type": "string",
+      "maxLength": 255
+    },
+    "attemptCount": {
+      "type": "integer",
+      "required": true,
+      "default": 0,
+      "min": 0
+    },
+    "lastError": {
+      "type": "text"
+    },
+    "dedupeKey": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "maxLength": 255
+    }
+  }
+}

@@ -128,14 +128,13 @@ module.exports = () => ({
       .filter(
         (cuenta) =>
           cuenta.diasRestantes !== null &&
-          cuenta.diasRestantes >= 1 &&
+          cuenta.diasRestantes >= 0 &&
           cuenta.diasRestantes <= 6 &&
           (cuenta.estado === "activa" || cuenta.estado === "por_vencer"),
       )
-      .sort((left, right) => left.diasRestantes - right.diasRestantes)
-      .slice(0, 5);
+      .sort((left, right) => left.diasRestantes - right.diasRestantes);
 
-    const usuariosPantallasPorVencer = perfiles
+    const usuariosPantallasBase = perfiles
       .map((perfil) => ({
         perfilId: perfil.documentId,
         cuentaDocumentId: perfil.cuenta?.documentId || "",
@@ -160,15 +159,26 @@ module.exports = () => ({
         (perfil) =>
           perfil.fechaVencimiento &&
           perfil.diasRestantes !== null &&
-          perfil.diasRestantes >= -1 &&
-          perfil.diasRestantes <= 1,
+          perfil.diasRestantes >= 0 &&
+          perfil.diasRestantes <= 6,
       )
       .sort(
         (left, right) =>
-          right.diasRestantes - left.diasRestantes ||
+          left.diasRestantes - right.diasRestantes ||
           left.nombre.localeCompare(right.nombre),
-      )
-      .slice(0, 5);
+      );
+    const automationService = strapi.service(
+      "api::automatizacion-whatsapp.automatizacion-whatsapp",
+    );
+    const contactoPorPerfil = await automationService.getLatestStatusesByProfileIds(
+      usuariosPantallasBase.map((perfil) => perfil.perfilId),
+      today,
+    );
+    const campanaCobroHoy = await automationService.getTodayCampaignSummary();
+    const usuariosPantallasPorVencer = usuariosPantallasBase.map((perfil) => ({
+      ...perfil,
+      contactoCobroHoy: contactoPorPerfil.get(perfil.perfilId) || null,
+    }));
 
     return {
       totals: {
@@ -186,6 +196,17 @@ module.exports = () => ({
       },
       cuentasProximasVencer,
       usuariosPantallasPorVencer,
+      campanaCobroHoy: campanaCobroHoy
+        ? {
+            documentId: campanaCobroHoy.documentId,
+            estado: campanaCobroHoy.estado,
+            totalObjetivos: campanaCobroHoy.totalObjetivos,
+            totalPendientes: campanaCobroHoy.totalPendientes,
+            totalEnviados: campanaCobroHoy.totalEnviados,
+            totalFallidos: campanaCobroHoy.totalFallidos,
+            totalOmitidos: campanaCobroHoy.totalOmitidos,
+          }
+        : null,
     };
   },
 });

@@ -1,0 +1,60 @@
+{
+  "kind": "singleType",
+  "collectionName": "configuracion_automatizacion_whatsapp",
+  "info": {
+    "singularName": "automatizacion-whatsapp",
+    "pluralName": "automatizaciones-whatsapp-config",
+    "displayName": "Automatización WhatsApp",
+    "description": "Configuración global de campañas automáticas por WhatsApp"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "activo": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "timezone": {
+      "type": "string",
+      "default": "America/Bogota",
+      "required": true,
+      "maxLength": 120
+    },
+    "hora_inicio_diaria": {
+      "type": "string",
+      "default": "09:00",
+      "required": true,
+      "maxLength": 5
+    },
+    "intervalo_minutos": {
+      "type": "integer",
+      "default": 2,
+      "required": true,
+      "min": 1,
+      "max": 1440
+    },
+    "maximo_envios_por_dia": {
+      "type": "integer",
+      "default": 200,
+      "required": true,
+      "min": 1
+    },
+    "modo_prueba": {
+      "type": "boolean",
+      "default": true,
+      "required": true
+    },
+    "pausado": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "template_meta_cobro_hoy": {
+      "type": "string",
+      "maxLength": 120
+    }
+  }
+}

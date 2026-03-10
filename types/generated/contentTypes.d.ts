@@ -373,6 +373,177 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiAutomatizacionWhatsappAutomatizacionWhatsapp
+  extends Struct.SingleTypeSchema {
+  collectionName: 'configuracion_automatizacion_whatsapp';
+  info: {
+    description: 'Configuraci\u00F3n global de campa\u00F1as autom\u00E1ticas por WhatsApp';
+    displayName: 'Automatizaci\u00F3n WhatsApp';
+    pluralName: 'automatizaciones-whatsapp-config';
+    singularName: 'automatizacion-whatsapp';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    activo: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    hora_inicio_diaria: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 5;
+      }> &
+      Schema.Attribute.DefaultTo<'09:00'>;
+    intervalo_minutos: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 1440;
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<2>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::automatizacion-whatsapp.automatizacion-whatsapp'
+    > &
+      Schema.Attribute.Private;
+    maximo_envios_por_dia: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<200>;
+    modo_prueba: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<true>;
+    pausado: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    publishedAt: Schema.Attribute.DateTime;
+    template_meta_cobro_hoy: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
+    timezone: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }> &
+      Schema.Attribute.DefaultTo<'America/Bogota'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiCampanaWhatsappCampanaWhatsapp
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'campanas_whatsapp';
+  info: {
+    description: 'Corridas operativas de automatizaci\u00F3n por WhatsApp';
+    displayName: 'Campa\u00F1a WhatsApp';
+    pluralName: 'campanas-whatsapp';
+    singularName: 'campana-whatsapp';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    automation_snapshot: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;
+    completedAt: Schema.Attribute.DateTime;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    estado: Schema.Attribute.Enumeration<
+      [
+        'programada',
+        'ejecutando',
+        'pausada',
+        'completada',
+        'fallida',
+        'cancelada',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'programada'>;
+    fecha_operativa: Schema.Attribute.Date & Schema.Attribute.Required;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::campana-whatsapp.campana-whatsapp'
+    > &
+      Schema.Attribute.Private;
+    mensajes: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::mensaje-whatsapp.mensaje-whatsapp'
+    >;
+    publishedAt: Schema.Attribute.DateTime;
+    scheduledStartAt: Schema.Attribute.DateTime;
+    startedAt: Schema.Attribute.DateTime;
+    tipo: Schema.Attribute.Enumeration<['cobro_hoy']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'cobro_hoy'>;
+    totalEnviados: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    totalFallidos: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    totalObjetivos: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    totalOmitidos: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    totalPendientes: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiClienteCliente extends Struct.CollectionTypeSchema {
   collectionName: 'clientes';
   info: {
@@ -620,6 +791,97 @@ export interface ApiInventarioCredencialInventarioCredencial
       Schema.Attribute.SetMinMaxLength<{
         maxLength: 120;
       }>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiMensajeWhatsappMensajeWhatsapp
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'mensajes_whatsapp';
+  info: {
+    description: 'Cola y bit\u00E1cora operativa de mensajes de WhatsApp';
+    displayName: 'Mensaje WhatsApp';
+    pluralName: 'mensajes-whatsapp';
+    singularName: 'mensaje-whatsapp';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    attemptCount: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
+    campana: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::campana-whatsapp.campana-whatsapp'
+    >;
+    cliente: Schema.Attribute.Relation<'manyToOne', 'api::cliente.cliente'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    cuenta: Schema.Attribute.Relation<'manyToOne', 'api::cuenta.cuenta'>;
+    dedupeKey: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    deliveredAt: Schema.Attribute.DateTime;
+    fecha_operativa: Schema.Attribute.Date & Schema.Attribute.Required;
+    lastError: Schema.Attribute.Text;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::mensaje-whatsapp.mensaje-whatsapp'
+    > &
+      Schema.Attribute.Private;
+    payload_snapshot: Schema.Attribute.JSON & Schema.Attribute.DefaultTo<{}>;
+    perfil: Schema.Attribute.Relation<'manyToOne', 'api::perfil.perfil'>;
+    provider: Schema.Attribute.Enumeration<['meta']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'meta'>;
+    providerMessageId: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    readAt: Schema.Attribute.DateTime;
+    scheduledFor: Schema.Attribute.DateTime;
+    sentAt: Schema.Attribute.DateTime;
+    servicio: Schema.Attribute.Relation<'manyToOne', 'api::servicio.servicio'>;
+    source: Schema.Attribute.Enumeration<['automatico', 'manual']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'automatico'>;
+    status: Schema.Attribute.Enumeration<
+      [
+        'pending',
+        'sending',
+        'sent',
+        'delivered',
+        'read',
+        'failed',
+        'skipped',
+        'canceled',
+      ]
+    > &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'pending'>;
+    telefono_snapshot: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+    tipo_accion: Schema.Attribute.Enumeration<['cobro_hoy']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'cobro_hoy'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -1492,9 +1754,12 @@ declare module '@strapi/strapi' {
       'admin::transfer-token': AdminTransferToken;
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
+      'api::automatizacion-whatsapp.automatizacion-whatsapp': ApiAutomatizacionWhatsappAutomatizacionWhatsapp;
+      'api::campana-whatsapp.campana-whatsapp': ApiCampanaWhatsappCampanaWhatsapp;
       'api::cliente.cliente': ApiClienteCliente;
       'api::cuenta.cuenta': ApiCuentaCuenta;
       'api::inventario-credencial.inventario-credencial': ApiInventarioCredencialInventarioCredencial;
+      'api::mensaje-whatsapp.mensaje-whatsapp': ApiMensajeWhatsappMensajeWhatsapp;
       'api::perfil.perfil': ApiPerfilPerfil;
       'api::plan.plan': ApiPlanPlan;
       'api::plantilla-whatsapp.plantilla-whatsapp': ApiPlantillaWhatsappPlantillaWhatsapp;

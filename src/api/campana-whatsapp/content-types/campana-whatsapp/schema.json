@@ -1,0 +1,90 @@
+{
+  "kind": "collectionType",
+  "collectionName": "campanas_whatsapp",
+  "info": {
+    "singularName": "campana-whatsapp",
+    "pluralName": "campanas-whatsapp",
+    "displayName": "Campaña WhatsApp",
+    "description": "Corridas operativas de automatización por WhatsApp"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "tipo": {
+      "type": "enumeration",
+      "enum": [
+        "cobro_hoy"
+      ],
+      "required": true,
+      "default": "cobro_hoy"
+    },
+    "fecha_operativa": {
+      "type": "date",
+      "required": true
+    },
+    "estado": {
+      "type": "enumeration",
+      "enum": [
+        "programada",
+        "ejecutando",
+        "pausada",
+        "completada",
+        "fallida",
+        "cancelada"
+      ],
+      "required": true,
+      "default": "programada"
+    },
+    "scheduledStartAt": {
+      "type": "datetime"
+    },
+    "startedAt": {
+      "type": "datetime"
+    },
+    "completedAt": {
+      "type": "datetime"
+    },
+    "totalObjetivos": {
+      "type": "integer",
+      "default": 0,
+      "required": true,
+      "min": 0
+    },
+    "totalPendientes": {
+      "type": "integer",
+      "default": 0,
+      "required": true,
+      "min": 0
+    },
+    "totalEnviados": {
+      "type": "integer",
+      "default": 0,
+      "required": true,
+      "min": 0
+    },
+    "totalFallidos": {
+      "type": "integer",
+      "default": 0,
+      "required": true,
+      "min": 0
+    },
+    "totalOmitidos": {
+      "type": "integer",
+      "default": 0,
+      "required": true,
+      "min": 0
+    },
+    "automation_snapshot": {
+      "type": "json",
+      "default": {}
+    },
+    "mensajes": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::mensaje-whatsapp.mensaje-whatsapp",
+      "mappedBy": "campana"
+    }
+  }
+}
